@@ -11,15 +11,23 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: function(origin, callback) {
-    // Izinkan permintaan tanpa origin (seperti aplikasi mobile atau curl)
-    if (!origin) return callback(null, true);
-    // Izinkan semua origin untuk sementara (debugging)
-    return callback(null, true);
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  credentials: true
+  origin: true, // Izinkan semua origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
+
+// Tambahkan middleware untuk menangani preflight OPTIONS request
+app.options('*', cors());
+
+// Tambahkan header untuk menangani masalah CORS
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  next();
+});
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
