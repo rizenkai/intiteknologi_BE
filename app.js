@@ -10,12 +10,16 @@ dotenv.config();
 const app = express();
 
 // Middleware
-const corsOptions = {
-  origin: ['http://localhost:3000', 'https://intiteknologi.netlify.app', 'https://sparkling-blini-119961.netlify.app'],
+app.use(cors({
+  origin: function(origin, callback) {
+    // Izinkan permintaan tanpa origin (seperti aplikasi mobile atau curl)
+    if (!origin) return callback(null, true);
+    // Izinkan semua origin untuk sementara (debugging)
+    return callback(null, true);
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  credentials: true,
-};
-app.use(cors(corsOptions));
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
