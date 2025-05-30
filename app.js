@@ -9,25 +9,12 @@ dotenv.config();
 
 const app = express();
 
-// Middleware
+// Middleware - Konfigurasi CORS sederhana
 app.use(cors({
-  origin: true, // Izinkan semua origin
+  origin: '*', // Izinkan semua origin
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
+  credentials: true
 }));
-
-// Tambahkan middleware untuk menangani preflight OPTIONS request
-app.options('*', cors());
-
-// Tambahkan header untuk menangani masalah CORS
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  next();
-});
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
