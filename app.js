@@ -35,6 +35,23 @@ const userRoutes = require('./routes/users');
 const activityLogRoutes = require('./routes/activityLog');
 const inputRoutes = require('./routes/inputs');
 
+// Root route for API status
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    message: 'Inti Teknologi API is running',
+    version: '1.0.0',
+    endpoints: [
+      '/api/auth',
+      '/api/documents',
+      '/api/admin',
+      '/api/users',
+      '/api/activity-log',
+      '/api/inputs'
+    ]
+  });
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/admin', adminRoutes);
