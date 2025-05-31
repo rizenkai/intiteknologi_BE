@@ -9,12 +9,16 @@ dotenv.config();
 
 const app = express();
 
-// Middleware - Konfigurasi CORS sederhana
+// Middleware - Konfigurasi CORS yang benar
 app.use(cors({
-  origin: '*', // Izinkan semua origin
+  origin: 'https://intiteknologi.netlify.app', // Netlify domain
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  credentials: true
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Middleware tambahan untuk menangani preflight requests
+app.options('*', cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
