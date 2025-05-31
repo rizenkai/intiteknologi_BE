@@ -9,17 +9,13 @@ dotenv.config();
 
 const app = express();
 
-// Middleware - Konfigurasi CORS sederhana
-app.use(cors());
-
-// Tambahkan header untuk menangani CORS
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://intiteknologi.netlify.app');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  next();
-});
+// Middleware - Konfigurasi CORS untuk mendukung credentials
+app.use(cors({
+  origin: 'https://intiteknologi.netlify.app',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
