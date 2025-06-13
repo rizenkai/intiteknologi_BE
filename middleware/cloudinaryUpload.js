@@ -6,7 +6,7 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: 'documents', // semua file masuk folder ini di Cloudinary
-    resource_type: 'auto', // otomatis: pdf, image, dll
+    resource_type: 'raw', // pastikan semua file (pdf, docx, dll) diupload sebagai raw agar bisa diakses publik
   },
 });
 
