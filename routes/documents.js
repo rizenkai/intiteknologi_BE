@@ -11,7 +11,7 @@ const {
 } = require('../controllers/documentController');
 // Legacy controller removed to avoid duplication
 const { protect, authorize } = require('../middleware/auth');
-const upload = require('../middleware/upload');
+const upload = require('../middleware/cloudinaryUpload');
 
 // Get all documents (filtered by user role)
 router.get('/', protect, getDocuments);

@@ -221,8 +221,8 @@ exports.uploadDocument = async (req, res) => {
       namaProyek,
       inputSets: parsedInputSets2,
       description: description || 'Dokumen baru',
-      fileName: req.file.filename,
-      filePath: req.file.path,
+      fileName: req.file.originalname,
+      filePath: req.file.path, // Cloudinary URL
       fileType: req.file.mimetype,
       fileSize: req.file.size,
       category: category || 'upload',
@@ -268,51 +268,17 @@ exports.updateDocumentFile = async (req, res) => {
     // Find the document to update
     const document = await Document.findById(documentId);
     if (!document) {
-      // If file was uploaded, delete it to avoid orphaned files
-      if (req.file && req.file.path) {
-        try {
-          fs.unlinkSync(req.file.path);
-        } catch (err) {
-          console.error('Error deleting file for non-existent document:', err);
-        }
-      }
       return res.status(404).json({ message: 'Document not found' });
     }
 
     // Cek: apakah filePath masih placeholder (angka saja)?
     const isFirstUpload = document.filePath === '/placeholder';
 
-    // Delete old file if it exists and is not a placeholder
-    if (document.filePath && document.filePath !== '/placeholder/path') {
-      const oldFilePath = path.join(__dirname, '..', document.filePath);
-      if (fs.existsSync(oldFilePath)) {
-        try {
-          fs.unlinkSync(oldFilePath);
-        } catch (err) {
-          console.error('Error deleting old file:', err);
-        }
-      }
-    }
-
-    // Get file information from multer
-    const { filename, path: filePath, mimetype, size } = req.file;
-    
-    // Create relative path for storage in database
-    const relativePath = filePath.split('uploads')[1];
-    const storedPath = 'uploads' + relativePath;
-
-    // Update document with new file information
-    document.fileName = filename;
-    // Perbaikan: deteksi upload pertama kali SEBELUM update filePath!
-    if (isFirstUpload) {
-      // upload pertama kali, filePath tetap angka placeholder
-      // setelah upload pertama, filePath HARUS diubah ke path file agar replace berikutnya terdeteksi
-      document.filePath = storedPath;
-    } else {
-      document.filePath = storedPath;
-    }
-    document.fileType = mimetype;
-    document.fileSize = size;
+    // Update document with new file information from Cloudinary
+    document.fileName = req.file.originalname;
+    document.filePath = req.file.path; // Cloudinary URL
+    document.fileType = req.file.mimetype;
+    document.fileSize = req.file.size;
     document.lastModified = new Date();
     
     // Save updated document
@@ -346,14 +312,6 @@ exports.updateDocumentFile = async (req, res) => {
       document
     });
   } catch (error) {
-    // If there was an error and a file was uploaded, delete it
-    if (req.file && req.file.path) {
-      try {
-        fs.unlinkSync(req.file.path);
-      } catch (err) {
-        console.error('Error deleting file after failed update:', err);
-      }
-    }
     console.error('Error updating document file:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
