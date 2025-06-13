@@ -11,7 +11,12 @@ const app = express();
 
 // Middleware - Konfigurasi CORS untuk mendukung credentials
 app.use(cors({
-  origin: ['https://intiteknologi.netlify.app', 'https://itiutama.com', 'https://www.itiutama.com'],
+  origin: [
+    'https://intiteknologi.netlify.app',
+    'https://itiutama.com',
+    'https://www.itiutama.com',
+    'http://localhost:3000'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
