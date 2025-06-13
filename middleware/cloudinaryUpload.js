@@ -11,6 +11,7 @@ const storage = new CloudinaryStorage({
     unique_filename: false, // jangan random, biarkan nama file asli
     overwrite: true, // boleh overwrite jika nama sama
     filename: file.originalname, // paksa nama file asli dari frontend
+    type: 'upload', // wajib agar file raw bisa diakses publik
   }),
 });
 
