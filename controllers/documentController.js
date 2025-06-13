@@ -24,11 +24,38 @@ exports.createDocumentManual = async (req, res) => {
       return res.status(400).json({ message: 'Target user is required' });
     }
     
+    // Parse inputSets (may come as JSON string when sent via FormData or URL-encoded)
+    let parsedInputSets = req.body.inputSets;
+    if (typeof parsedInputSets === 'string') {
+      try {
+        parsedInputSets = JSON.parse(parsedInputSets);
+      } catch (err) {
+        console.warn('Failed to parse inputSets JSON string:', err.message);
+        parsedInputSets = [];
+      }
+    }
+    
+    // Fallback: if inputSets still empty, build from flat FormData keys like inputSets[0][bp]
+    if ((!parsedInputSets || parsedInputSets.length === 0) && req.body) {
+      const temp = {};
+      Object.keys(req.body).forEach(key => {
+        const m = key.match(/^inputSets\[(\d+)\]\[(\w+)\]$/);
+        if (m) {
+          const idx = parseInt(m[1], 10);
+          const field = m[2];
+          if (!temp[idx]) temp[idx] = {};
+          temp[idx][field] = req.body[key];
+        }
+      });
+      parsedInputSets = Object.values(temp);
+    }
+    
     // Placeholder values for required file fields
     // Jika dokumen manual/placeholder, filePath hanya angka (tanpa prefix /placeholder/)
     const placeholderId = await generatePlaceholderId();
     const document = await Document.create({
       namaProyek,
+      inputSets: parsedInputSets,
       description: description || 'Dokumen baru',
       fileName: 'placeholder.txt',
       filePath: `/placeholder/${placeholderId}`,
@@ -164,8 +191,35 @@ exports.uploadDocument = async (req, res) => {
       return res.status(409).json({ message: 'Document with this namaProyek already exists' });
     }
 
+    // Parse inputSets (may come as JSON string when sent via FormData or URL-encoded)
+    let parsedInputSets2 = req.body.inputSets;
+    if (typeof parsedInputSets2 === 'string') {
+      try {
+        parsedInputSets2 = JSON.parse(parsedInputSets2);
+      } catch (err) {
+        console.warn('Failed to parse inputSets JSON string:', err.message);
+        parsedInputSets2 = [];
+      }
+    }
+    
+    // Fallback: if inputSets still empty, build from flat FormData keys like inputSets[0][bp]
+    if ((!parsedInputSets2 || parsedInputSets2.length === 0) && req.body) {
+      const tmp = {};
+      Object.keys(req.body).forEach(key => {
+        const m = key.match(/^inputSets\[(\d+)\]\[(\w+)\]$/);
+        if (m) {
+          const idx = parseInt(m[1], 10);
+          const field = m[2];
+          if (!tmp[idx]) tmp[idx] = {};
+          tmp[idx][field] = req.body[key];
+        }
+      });
+      parsedInputSets2 = Object.values(tmp);
+    }
+    
     const document = await Document.create({
       namaProyek,
+      inputSets: parsedInputSets2,
       description: description || 'Dokumen baru',
       fileName: req.file.filename,
       filePath: req.file.path,
