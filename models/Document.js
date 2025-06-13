@@ -1,6 +1,19 @@
 const mongoose = require('mongoose');
 
 const documentSchema = new mongoose.Schema({
+  inputSets: {
+    type: [
+      {
+        tipePengujian: { type: String, trim: true, default: '' },
+        bp: { type: String, trim: true, default: '' },
+        kodeBahan: { type: String, trim: true, default: '' },
+        mutuBahan: { type: String, trim: true, default: '' },
+        tipeBahan: { type: String, trim: true, default: '' },
+        warna: { type: String, trim: true, default: '' }
+      }
+    ],
+    default: []
+  },
   namaProyek: {
     type: String,
     required: true,
